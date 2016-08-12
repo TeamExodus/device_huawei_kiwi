@@ -94,9 +94,9 @@ public class KeyHandler implements DeviceKeyHandler {
 
         final Resources resources = mContext.getResources();
         mProximityTimeOut = resources.getInteger(
-                R.integer.config_proximityCheckTimeout);
+                com.android.internal.R.integer.config_proximityCheckTimeout);
         mProximityWakeSupported = resources.getBoolean(
-                R.bool.config_proximityCheckOnWake);
+                com.android.internal.R.bool.config_proximityCheckOnWake);
 
         if (mProximityWakeSupported) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -120,8 +120,9 @@ public class KeyHandler implements DeviceKeyHandler {
 
             switch (msg.arg1) {
                 case KEY_GESTURE_C:
-                    startIntent = new Intent(
-                            cyanogenmod.content.Intent.ACTION_SCREEN_CAMERA_GESTURE);
+                    if (msg.obj != null && msg.obj instanceof DeviceHandlerCallback) {
+                        ((DeviceHandlerCallback) msg.obj).onScreenCameraGesture();
+                    }
                     broadcast = true;
                     break;
 
@@ -247,7 +248,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private boolean isProximityDefaultEnabled() {
         return mContext.getResources().getBoolean(
-                R.bool.config_proximityCheckOnWakeEnabledByDefault);
+                com.android.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
     }
 
     private Intent getLaunchableIntent(Intent intent) {
