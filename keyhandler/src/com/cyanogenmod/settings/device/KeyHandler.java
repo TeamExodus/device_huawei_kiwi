@@ -94,9 +94,9 @@ public class KeyHandler implements DeviceKeyHandler {
 
         final Resources resources = mContext.getResources();
         mProximityTimeOut = resources.getInteger(
-                org.cyanogenmod.platform.internal.R.integer.config_proximityCheckTimeout);
+                R.integer.config_proximityCheckTimeout);
         mProximityWakeSupported = resources.getBoolean(
-                org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWake);
+                R.bool.config_proximityCheckOnWake);
 
         if (mProximityWakeSupported) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -247,7 +247,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private boolean isProximityDefaultEnabled() {
         return mContext.getResources().getBoolean(
-            org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
+                R.bool.config_proximityCheckOnWakeEnabledByDefault);
     }
 
     private Intent getLaunchableIntent(Intent intent) {
