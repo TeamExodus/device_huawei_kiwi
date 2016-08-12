@@ -16,6 +16,7 @@
 
 package com.cyanogenmod.settings.device;
 
+import android.app.KeyguardManager;
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -41,6 +42,9 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.KeyEvent;
 
+
+import android.provider.MediaStore;
+
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.ArrayUtils;
 
@@ -50,6 +54,13 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private static final String TAG = KeyHandler.class.getSimpleName();
     private static final int GESTURE_REQUEST = 1;
+
+
+    private static final String KEY_GESTURE_HAPTIC_FEEDBACK =
+            "touchscreen_gesture_haptic_feedback";
+
+    private static final String ACTION_DISMISS_KEYGUARD =
+            "com.android.keyguard.action.DISMISS_KEYGUARD_SECURELY";
 
     /*
      * Supported scancodes:
@@ -74,6 +85,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private final Context mContext;
     private final PowerManager mPowerManager;
+    private KeyguardManager mKeyguardManager;
     private EventHandler mEventHandler;
     private SensorManager mSensorManager;
     private Sensor mProximitySensor;
@@ -111,6 +123,12 @@ public class KeyHandler implements DeviceKeyHandler {
         }
     }
 
+    private void ensureKeyguardManager() {
+        if (mKeyguardManager == null) {
+            mKeyguardManager =
+                    (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
+        }
+    }
     private class EventHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -120,10 +138,25 @@ public class KeyHandler implements DeviceKeyHandler {
 
             switch (msg.arg1) {
                 case KEY_GESTURE_C:
-                    if (msg.obj != null && msg.obj instanceof DeviceHandlerCallback) {
-                        ((DeviceHandlerCallback) msg.obj).onScreenCameraGesture();
-                    }
-                    broadcast = true;
+//                    startIntent = getLaunchableIntent(
+//                            new Intent(Intent.ACTION_SCREEN_CAMERA_GESTURE));
+
+                ensureKeyguardManager();
+                final String action;
+                mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
+                if (mKeyguardManager.isKeyguardSecure() && mKeyguardManager.isKeyguardLocked()) {
+                    action = MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE;
+                } else {
+                    mContext.sendBroadcastAsUser(new Intent(ACTION_DISMISS_KEYGUARD),
+                            UserHandle.CURRENT);
+                    action = MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA;
+                }
+                mPowerManager.wakeUp(SystemClock.uptimeMillis(), "wakeup-gesture");
+                Intent intent = new Intent(action, null);
+                startActivitySafely(intent);
+                doHapticFeedback();
+
+                    ignoreKey = true;
                     break;
 
                 case KEY_GESTURE_E:
@@ -239,8 +272,8 @@ public class KeyHandler implements DeviceKeyHandler {
         if (mVibrator == null) {
             return;
         }
-        boolean enabled = Settings.System.getInt(mContentResolver,
-                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
+        boolean enabled = Settings.System.getInt(mContext.getContentResolver(),
+                KEY_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
         if (enabled) {
             mVibrator.vibrate(50);
         }
