@@ -28,4 +28,15 @@
     <string name="touchscreen_w_gesture_title">Browser</string>
     <string name="touchscreen_w_gesture_summary">Draw a \"W\" to open the browser app</string>
 
+    <!-- Device specific settings -->
+    <string name="device_settings_app_name">Advanced settings</string>
+
+    <!-- Touchscreen gestures -->
+    <string name="screen_gestures_panel_title">Gestures</string>
+
+    <!-- Touchscreen gesture haptic feedback -->
+    <string name="touchscreen_gesture_extras">Extras</string>
+    <string name="touchscreen_gesture_haptic_feedback">Haptic feedback</string>
+    <string name="touchscreen_gesture_haptic_feedback_summary">Vibrate when a gesture got detected</string>
+
 </resources>

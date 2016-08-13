@@ -59,7 +59,7 @@ public class TouchscreenGestureSettings extends PreferenceActivity {
     protected void onResume() {
         super.onResume();
         mHapticFeedback.setChecked(Settings.System.getInt(getContentResolver(),
-                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0);
+                KEY_HAPTIC_FEEDBACK, 1) != 0);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TouchscreenGestureSettings extends PreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             final boolean value = (Boolean) newValue;
             Settings.System.putInt(getContentResolver(),
-                    Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, value ? 1 : 0);
+                    KEY_HAPTIC_FEEDBACK, value ? 1 : 0);
             return true;
         }
     };
